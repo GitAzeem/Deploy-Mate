@@ -1,0 +1,52 @@
+---
+- name: Install Redis
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Update apt repository on Ubuntu and Debian
+      apt:
+        update_cache: yes
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install Redis on Ubuntu and Debian
+      apt:
+        name: redis-server
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install Redis on CentOS, Red Hat, or Fedora
+      dnf:
+        name: redis
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Install Redis on Arch Linux
+      pacman:
+        name: redis
+        state: present
+      when: ansible_distribution == "Arch"
+
+    - name: Install Redis on other distributions
+      shell: |
+        echo "Redis installation not supported on this OS."
+      when: ansible_distribution not in ["Ubuntu", "Debian", "CentOS", "RedHat", "Fedora", "Arch"]
+
+    - name: Ensure Redis is running and enabled
+      service:
+        name: redis
+        state: started
+        enabled: yes
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora", "Ubuntu", "Debian"]
+
+    - name: Ensure Redis is running and enabled on Arch Linux
+      service:
+        name: redis
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Arch"

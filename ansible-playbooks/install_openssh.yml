@@ -1,0 +1,28 @@
+---
+- name: Install OpenSSH
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Install OpenSSH on Ubuntu and Debian
+      apt:
+        name: openssh-server
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install OpenSSH on CentOS, Red Hat, or Fedora
+      dnf:
+        name: openssh-server
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure OpenSSH is running and enabled
+      service:
+        name: ssh
+        state: started
+        enabled: yes

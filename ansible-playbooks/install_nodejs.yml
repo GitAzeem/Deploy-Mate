@@ -1,0 +1,30 @@
+---
+- name: Install Node.js
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Install Node.js on Ubuntu and Debian
+      apt:
+        name: nodejs
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install Node.js on CentOS, Red Hat, or Fedora
+      dnf:
+        name: nodejs
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure Node.js is installed
+      command: node --version
+      register: node_version
+
+    - name: Display Node.js version
+      debug:
+        msg: "Node.js version: {{ node_version.stdout }}"

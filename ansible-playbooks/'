@@ -1,0 +1,28 @@
+---
+- name: Install Nginx
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Install Nginx on Ubuntu and Debian
+      apt:
+        name: nginx
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install Nginx on CentOS, Red Hat, or Fedora
+      dnf:
+        name: nginx
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure Nginx is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: yes

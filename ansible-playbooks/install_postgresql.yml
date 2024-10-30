@@ -1,0 +1,32 @@
+---
+- name: Install PostgreSQL
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Install PostgreSQL on Ubuntu and Debian
+      apt:
+        name: postgresql
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install PostgreSQL on CentOS, Red Hat, or Fedora
+      dnf:
+        name: postgresql-server
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure PostgreSQL is initialized
+      command: /usr/bin/postgresql96-setup initdb
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure PostgreSQL is running and enabled
+      service:
+        name: postgresql
+        state: started
+        enabled: yes

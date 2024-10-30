@@ -1,0 +1,30 @@
+---
+- name: Install Python
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Install Python on Ubuntu and Debian
+      apt:
+        name: python3
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install Python on CentOS, Red Hat, or Fedora
+      dnf:
+        name: python3
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure Python is installed
+      command: python3 --version
+      register: python_version
+
+    - name: Display Python version
+      debug:
+        msg: "Python version: {{ python_version.stdout }}"

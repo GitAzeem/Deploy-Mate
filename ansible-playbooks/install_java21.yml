@@ -1,0 +1,30 @@
+---
+- name: Install Java 21
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display ansible_distribution
+      debug:
+        msg: "The distribution is: {{ ansible_distribution }}"
+
+    - name: Install Java 21 on Ubuntu and Debian
+      apt:
+        name: openjdk-21-jdk
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install Java 21 on CentOS, Red Hat, or Fedora
+      dnf:
+        name: java-21-openjdk-devel
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat", "Fedora"]
+
+    - name: Ensure Java 21 is installed
+      command: java -version
+      register: java_version
+
+    - name: Display Java 21 version
+      debug:
+        msg: "Java 21 version: {{ java_version.stdout }}"
